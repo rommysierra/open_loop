@@ -1,0 +1,46 @@
+import random
+import matplotlib.pyplot as plt
+
+def sigmoid(x):
+    return 1 / (1 + 2.71828**(-x))
+
+def generate_binary_spike_train(num_steps, firing_rate):
+    spike_train = [random.random() < firing_rate for _ in range(num_steps)]
+    return [int(spike) for spike in spike_train]
+
+def simulate_neuron(inputs, weights, threshold):
+    activation = sigmoid(sum(input_val * weight for input_val, weight in zip(inputs, weights)))
+    return int(activation >= threshold)
+
+def raster_plot(spike_train, title, color='black'):
+    num_steps = len(spike_train)
+    spike_indices = [i for i, spike in enumerate(spike_train) if spike]
+    plt.eventplot([spike_indices], colors=color, linelengths=0.8)
+    plt.title(title)
+    plt.xlabel('Time Steps (1 ms intervals)')
+    plt.ylabel('Neuron Index')
+    plt.show()
+
+# Define neural network parameters
+input_size = 4
+output_size = 1
+threshold = 0.65
+
+# Generate random weights for the neural network
+input_weights = [random.random() for _ in range(input_size)]
+output_weights = [random.random() for _ in range(output_size)]
+
+# Generate input spike train
+input_spike_train = generate_binary_spike_train(num_steps=50, firing_rate=0.2)
+
+# Initialize output spike train
+output_spike_train = [0] * 50
+
+# Simulate the neural network
+for step in range(50):
+    inputs = [input_spike_train[step]]
+    output_spike_train[step] = simulate_neuron(inputs, output_weights, threshold)
+
+# Generate raster plots for input and output spikes
+raster_plot(input_spike_train, 'Input Spike Train', color='blue')
+raster_plot(output_spike_train, 'Output Spike Train', color='red')
